@@ -23,6 +23,10 @@ deallocation_test_() ->
   {"Can deallocate frequencies",
    ?setup(fun deallocation/1)}.
 
+flushing_mailbox_test_() ->
+  {"Can flush the mailbox of unread messages",
+   ?setup(fun flush_mailbox/1)}.
+
 %%%
 %%% ACTUAL TESTS
 %%%
@@ -42,11 +46,18 @@ deallocation(_) ->
   Result = frequency2:deallocate(10),
   ?_assertEqual(ok, Result).
 
+flush_mailbox(_) ->
+  frequency ! an_unexpected_message,
+  frequency2:allocate(),
+  Result = erlang:process_info(whereis(frequency), messages),
+  ?_assertEqual({messages, []}, Result).
+
 %%%
 %%% SETUP FUNCTIONS
 %%%
 start() ->
-  frequency2:start().
+  frequency2:start(),
+  timer:sleep(5).
 
 stop(_) ->
   catch frequency2:stop().

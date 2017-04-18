@@ -7,7 +7,7 @@
 %%   (c) Francesco Cesarini and Simon Thompson
 
 -module(frequency2).
--export([start/0, allocate/0, deallocate/1, stop/0]).
+-export([start/0, allocate/0, deallocate/1, stop/0, clear/0]).
 -export([init/0]).
 
 %% These are the start functions used to create and
@@ -27,6 +27,7 @@ get_frequencies() -> [10,11,12,13,14,15].
 %% The Main Loop
 
 loop(Frequencies) ->
+  clear(),
   receive
     {request, Pid, allocate} ->
       {NewFrequencies, Reply} = allocate(Frequencies, Pid),
@@ -59,6 +60,13 @@ stop() ->
     receive
 	    {reply, Reply} -> Reply
     end.
+
+clear() ->
+  receive
+    _ -> clear()
+  after 0 ->
+    ok
+  end.
 
 
 %% The Internal Help Functions used to allocate and
