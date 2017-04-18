@@ -27,6 +27,10 @@ flushing_mailbox_test_() ->
   {"Can flush the mailbox of unread messages",
    ?setup(fun flush_mailbox/1)}.
 
+server_busy_test_() ->
+  {"Can timeout when allocation takes too long",
+   ?setup(fun server_busy/1)}.
+
 %%%
 %%% ACTUAL TESTS
 %%%
@@ -51,6 +55,12 @@ flush_mailbox(_) ->
   frequency2:allocate(),
   Result = erlang:process_info(whereis(frequency), messages),
   ?_assertEqual({messages, []}, Result).
+
+server_busy(_) ->
+  erlang:suspend_process(whereis(frequency)),
+  Result = frequency2:allocate(),
+  erlang:resume_process(whereis(frequency)),
+  ?_assertEqual(timeout, Result).
 
 %%%
 %%% SETUP FUNCTIONS

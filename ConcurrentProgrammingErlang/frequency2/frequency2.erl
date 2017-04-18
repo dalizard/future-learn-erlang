@@ -47,6 +47,8 @@ allocate() ->
     frequency ! {request, self(), allocate},
     receive
 	    {reply, Reply} -> Reply
+    after 100 ->
+      timeout
     end.
 
 deallocate(Freq) ->
